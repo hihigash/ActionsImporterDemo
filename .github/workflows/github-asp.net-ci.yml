@@ -11,7 +11,7 @@ env:
   BuildConfiguration: release
   BuildPlatform: any cpu
   Parameters_ArtifactName: drop
-  Parameters_solution: "**\\*.sln"
+  Parameters_solution: "SampleWebApplication.sln"
   system_debug: 'false'
 jobs:
   Job_1:
