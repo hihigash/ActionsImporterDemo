@@ -1,0 +1,69 @@
+name: GitHub/GitHub-ASP.NET-CI
+on:
+  push:
+    branches:
+    - main
+    paths:
+    - "*"
+    - "!/azure-pipelines.yml"
+env:
+  BuildConfiguration: release
+  BuildPlatform: any cpu
+  Parameters_ArtifactName: drop
+  Parameters_solution: "**\\*.sln"
+  system_debug: 'false'
+jobs:
+  Job_1:
+    name: Agent job 1
+    runs-on: windows-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v3.3.0
+    - name: Use NuGet
+      uses: nuget/setup-nuget@v1.1.1
+      with:
+        nuget-version: 6.4.0
+    - name: NuGet restore
+      run: nuget restore ${{ env.Parameters_solution }} -Verbosity "Detailed"
+    - name: install msbuild
+      uses: microsoft/setup-msbuild@v1.1.3
+    - name: run msbuild
+      run: msbuild ${{ env.Parameters_solution }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="${{ runner.temp }}\\" -p:Configuration=${{ env.BuildConfiguration }} -p:Platform="${{ env.BuildPlatform }}" -v:normal
+    - name: Test Assemblies
+      uses: microsoft/vstest-action@v1.0.0
+      with:
+        testAssembly: |-
+          **\${{ env.BuildConfiguration }}\*test*.dll
+          !**\obj\**
+        searchFolder: "${{ github.workspace }}"
+        vstestLocationMethod: version
+        vsTestVersion: latest
+        runInParallel: 'False'
+        runTestsInIsolation: 'False'
+        codeCoverageEnabled: 'False'
+        platform: "${{ env.BuildPlatform }}"
+#     # Unsupported configuration for PublishSymbols task
+#     - name: Publish symbols path
+#       continue-on-error: true
+#       SymbolsFolder: "${{ github.workspace }}"
+#       SearchPattern: "**\\bin\\**\\*.pdb"
+#       IndexSources: true
+#       PublishSymbols: false
+#       SymbolServerType: TeamServices
+#       SymbolsPath:
+#       CompressSymbols: false
+#       SymbolExpirationInDays: 36530.0
+#       IndexableFileFormats: Default
+#       DetailedLog: true
+#       TreatNotIndexedAsWarning: false
+#       UseNetCoreClientTool: false
+#       SymbolsMaximumWaitTime:
+#       SymbolsProduct:
+#       SymbolsVersion:
+#       SymbolsArtifactName: Symbols_${{ env.BuildConfiguration }}
+    - name: Publish Artifact
+      if: success() || failure()
+      uses: actions/upload-artifact@v3.1.1
+      with:
+        name: "${{ env.Parameters_ArtifactName }}"
+        path: "\\\\my\\share\\${{ github.workflow }}\\${{ github.run_number }}"
