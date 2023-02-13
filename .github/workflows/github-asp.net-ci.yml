@@ -29,7 +29,7 @@ jobs:
     - name: install msbuild
       uses: microsoft/setup-msbuild@v1.1.3
     - name: run msbuild
-      run: msbuild ${{ env.Parameters_solution }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="${{ runner.temp }}" /p:Configuration=${{ env.BuildConfiguration }} /p:Platform="${{ env.BuildPlatform }}" /v:normal
+      run: msbuild ${{ env.Parameters_solution }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="${{ runner.temp }}\\drop" /p:Configuration=${{ env.BuildConfiguration }} /p:Platform="${{ env.BuildPlatform }}" /v:normal
 #    - name: Test Assemblies
 #      uses: microsoft/vstest-action@v1.0.0
 #      with:
@@ -67,4 +67,4 @@ jobs:
       uses: actions/upload-artifact@v3.1.1
       with:
         name: "${{ env.Parameters_ArtifactName }}"
-        path: "${{ runner.temp }}"
+        path: "${{ runner.temp }}\\drop"
