@@ -6,6 +6,7 @@ on:
     paths:
     - "*"
     - "!/azure-pipelines.yml"
+  workflow_dispatch:
 env:
   BuildConfiguration: release
   BuildPlatform: any cpu
