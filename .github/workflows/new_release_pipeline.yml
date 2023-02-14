@@ -1,8 +1,8 @@
 name: GitHub/New_release_pipeline
 on:
-  workflow_dispatch:
+#  workflow_dispatch:
   workflow_run:
-    workflows: [github-asp.net-ci]
+    workflows: ["github-asp.net-ci"]
     types: [completed]
 jobs:
   Production:
