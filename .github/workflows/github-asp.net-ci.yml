@@ -6,12 +6,11 @@ on:
     paths:
     - "*"
     - "!/azure-pipelines.yml"
-  workflow_dispatch:
 env:
   BuildConfiguration: release
-  BuildPlatform: 'any cpu'
+  BuildPlatform: any cpu
   Parameters_ArtifactName: drop
-  Parameters_solution: "SampleWebApplication.sln"
+  Parameters_solution: "**\\*.sln"
   system_debug: 'false'
 jobs:
   Job_1:
@@ -27,22 +26,22 @@ jobs:
     - name: NuGet restore
       run: nuget restore ${{ env.Parameters_solution }} -Verbosity "Detailed"
     - name: install msbuild
-      uses: microsoft/setup-msbuild@v1.1.3
+      uses: microsoft/setup-msbuild@v1.3.1
     - name: run msbuild
-      run: msbuild ${{ env.Parameters_solution }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="${{ runner.temp }}\drop" /p:Configuration=${{ env.BuildConfiguration }} /p:Platform="${{ env.BuildPlatform }}" /v:normal
-#    - name: Test Assemblies
-#      uses: microsoft/vstest-action@v1.0.0
-#      with:
-#        testAssembly: |-
-#          **\${{ env.BuildConfiguration }}\*test*.dll
-#          !**\obj\**
-#        searchFolder: "${{ github.workspace }}"
-#        vstestLocationMethod: version
-#        vsTestVersion: latest
-#        runInParallel: 'False'
-#        runTestsInIsolation: 'False'
-#        codeCoverageEnabled: 'False'
-#        platform: "${{ env.BuildPlatform }}"
+      run: msbuild ${{ env.Parameters_solution }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="${{ runner.temp }}\\" -p:Configuration=${{ env.BuildConfiguration }} -p:Platform="${{ env.BuildPlatform }}" -v:normal
+    - name: Test Assemblies
+      uses: microsoft/vstest-action@v1.0.0
+      with:
+        testAssembly: |-
+          **\${{ env.BuildConfiguration }}\*test*.dll
+          !**\obj\**
+        searchFolder: "${{ github.workspace }}"
+        vstestLocationMethod: version
+        vsTestVersion: latest
+        runInParallel: 'False'
+        runTestsInIsolation: 'False'
+        codeCoverageEnabled: 'False'
+        platform: "${{ env.BuildPlatform }}"
 #     # Unsupported configuration for PublishSymbols task
 #     - name: Publish symbols path
 #       continue-on-error: true
@@ -67,4 +66,4 @@ jobs:
       uses: actions/upload-artifact@v3.1.1
       with:
         name: "${{ env.Parameters_ArtifactName }}"
-        path: "${{ runner.temp }}\\drop"
+        path: "\\\\my\\share\\${{ github.workflow }}\\${{ github.run_number }}"
