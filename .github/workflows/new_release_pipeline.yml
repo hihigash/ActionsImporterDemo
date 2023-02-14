@@ -9,4 +9,6 @@ jobs:
       cancel-in-progress: false
     if: github.event_type != 'pull_request'
     steps:
+      - name: Sample
+        run: echo Hello, world! 
 #     # 497d490f-eea7-4f2b-ab94-48d9c1acdcb1@4: unsupported application type ($(Parameters.WebAppKind))
